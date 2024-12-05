@@ -26,12 +26,11 @@
 </data>
  </layer>
  <objectgroup id="4" name="Dialog">
-  <object id="9" type="DialogTest" x="560" y="1120" width="70" height="70"/>
+  <object id="9" name="DialogTest" x="560" y="1120" width="70" height="70"/>
  </objectgroup>
  <objectgroup id="2" name="Collision">
   <object id="1" x="0" y="1260" width="910" height="140"/>
   <object id="2" x="910" y="1260" width="70" height="70"/>
-  <object id="3" x="350.667" y="881.333" height="2.66667"/>
  </objectgroup>
  <objectgroup color="#00ff00" id="3" name="Player">
   <object id="4" name="mainPlayer" x="140" y="1120" width="35" height="88"/>
