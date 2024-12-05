@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisie Frustrante d'Adresse</title>
+</head>
+<body>
+    <h3>Essayez de remplir l'adresse :</h3>
+    <input id="addressInput" type="text" placeholder="123/Rue de la paix/Appartement/75000/Paris/Ile-de-France/France" />
+    <button id="backspaceButton">Retour</button>
+    <div id="captchaContainer" style="display: none;">
+        <p id="captchaQuestion"></p>
+        <input type="text" id="captchaAnswer" placeholder="Répondez ici..." />
+        <button id="verifyCaptchaButton">Vérifier</button>
+    </div>
+    <script>
+        function generateRandomMappings() {
+            const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const shuffledLetters = letters.split('').sort(() => Math.random() - 0.5).join('');
+            const letterMap = {};
+
+            for (let i = 0; i < letters.length; i++) {
+                letterMap[letters[i]] = shuffledLetters[i];
+            }
+
+            return letterMap;
+        }
+
+        function generateCaptcha() {
+            const a = Math.floor(Math.random() * 10 + 1);
+            const b = Math.floor(Math.random() * 10 + 1);
+            const operator = Math.random() < 0.5 ? '+' : '-';
+            const question = `Combien font ${a} ${operator} ${b} ?`;
+            const answer = operator === '+' ? (a + b).toString() : (a - b).toString();
+
+            return {
+                question: question,
+                answer: answer
+            };
+        }
+
+        const letterMap = generateRandomMappings();
+        const inputField = document.getElementById('addressInput');
+        let randomCharsActive = false;
+        let la2emeEpreuve = false;
+
+        const streetKeywords = ["*","rue", "avenue", "boulevard", "place", "chemin", "allée", "impasse"];
+
+        inputField.addEventListener('keydown', (event) => {
+            const value = inputField.value;
+
+            if (event.key === "Backspace") {
+                event.preventDefault();
+                currentCaptcha = generateCaptcha();
+                captchaQuestion.textContent = currentCaptcha.question;
+                captchaContainer.style.display = 'block';
+                return;
+            }
+
+            if (event.key === " ") {
+                const lastWord = value.split("/").pop().split(" ").pop().toLowerCase();
+                if (streetKeywords.includes(lastWord)) {
+                    la2emeEpreuve = false;
+                } else {
+                    alert("Nom du début de la rue invalide.");
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            if (value.includes("/") && !randomCharsActive) {
+                la2emeEpreuve = true;
+                randomCharsActive = true;
+            }
+
+            if (la2emeEpreuve) {
+                if (!/[a-zA-Z]/.test(event.key) || event.key === 'Shift' || event.key === 'CapsLock') {
+                    return;
+                }
+                event.preventDefault();
+
+                const originalChar = event.key;
+                const mappedChar = letterMap[originalChar] || originalChar;
+
+                inputField.value += mappedChar;
+            }
+        });
+
+        const backspaceButton = document.getElementById('backspaceButton');
+        const captchaContainer = document.getElementById('captchaContainer');
+        const captchaQuestion = document.getElementById('captchaQuestion');
+        const captchaAnswer = document.getElementById('captchaAnswer');
+        const verifyCaptchaButton = document.getElementById('verifyCaptchaButton');
+
+        let currentCaptcha = null;
+
+        function verifyCaptcha() {
+            if (captchaAnswer.value === currentCaptcha.answer) {
+                const lastSlashIndex = inputField.value.lastIndexOf("/");
+                if (lastSlashIndex !== -1) {
+                    inputField.value = inputField.value.slice(0, lastSlashIndex + 1);
+                } else {
+                    inputField.value = "";
+                }
+                captchaContainer.style.display = 'none';
+                captchaAnswer.value = '';
+                currentCaptcha = null;
+            } else {
+                alert("Captcha incorrect. Essayez encore !");
+            }
+        }
+
+        backspaceButton.addEventListener('click', () => {
+            currentCaptcha = generateCaptcha();
+            captchaQuestion.textContent = currentCaptcha.question;
+            captchaContainer.style.display = 'block';
+        });
+
+        verifyCaptchaButton.addEventListener('click', verifyCaptcha);
+
+        captchaAnswer.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                verifyCaptcha();
+            }
+        });
+    </script>
+</body>
+</html>
