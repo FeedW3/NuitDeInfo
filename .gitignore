@@ -1,0 +1,5 @@
+# nodes modules
+node_modules/
+package-lock.json
+Vagrantfile
+.vagrant
