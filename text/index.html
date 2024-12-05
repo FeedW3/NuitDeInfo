@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>melonJS - Webfont and BitmapText</title>
+  <link rel="stylesheet" type="text/css" media="screen" href="index.css">
+</head>
+<body
+  <!-- Since import maps are not yet supported by all browsers, its is necessary to add the polyfill es-module-shims.js -->
+  <script async src="https://unpkg.com/es-module-shims@1.7.3/dist/es-module-shims.js"></script>
+  <script type="importmap">
+      {
+          "imports": {
+              "melonjs": "https://cdn.jsdelivr.net/npm/melonjs@17/+esm",
+              "debugPlugin" : "https://cdn.jsdelivr.net/npm/@melonjs/debug-plugin/dist/@melonjs/debug-plugin.min.js"
+          }
+      }
+  </script>
+
+  <!-- Canvas placeholder -->
+  <div id="screen"></div>
+
+  <!-- Bootstrap -->
+  <script type="module">
+      import * as me from 'melonjs';
+      import { DebugPanelPlugin } from "debugPlugin";
+      import TextTest from './text.js';
+
+      me.device.onReady(() => {
+          // Initialize the video.
+          if (!me.video.init(640, 480, {parent : "screen", scale : "auto", renderer: me.video.AUTO, preferWebGL1 : false})) {
+              alert("Your browser does not support HTML5 canvas.");
+              return;
+          }
+
+          // register the debug plugin
+          me.plugin.register(DebugPanelPlugin,  "debugPanel");
+
+          // set all ressources to be loaded
+          me.loader.preload([
+              { name: "xolo12", type:"image", src: "xolo12.png"},
+              { name: "xolo12", type:"binary", src: "xolo12.fnt"},
+              { name: "arialfancy", type:"image", src: "arialfancy.png"},
+              { name: "arialfancy", type:"binary", src: "arialfancy.fnt"}],
+              function () {
+                  me.game.world.reset();
+                  me.game.world.addChild(new TextTest(), 1);
+              }
+          );
+      });
+  </script>
+</body>
+</html>
